@@ -89,7 +89,8 @@ public class PessoaEnpointV1 extends AbstractEndpoint {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<EntityModel<PessoaDTO>> findById(@org.springframework.lang.NonNull @PathVariable("id") Long id) {
+    public ResponseEntity<EntityModel<PessoaDTO>> findById(
+            @org.springframework.lang.NonNull @PathVariable("id") Long id) {
 
         var pessoa = pessoaService.findById(id).orElseThrow(() -> new PessoaNotFoundException(id));
 

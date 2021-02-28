@@ -11,6 +11,9 @@ import javax.persistence.Table;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Past;
+import javax.validation.constraints.PastOrPresent;
+import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.br.CPF;
 
@@ -37,6 +40,7 @@ public class Pessoa implements IDomain<Long> {
     @EqualsAndHashCode.Include
     private Long id;
     @NotEmpty
+    @Size(min = 1, max = 200)
     @Column(name = "NOME")
     private String nome;
     @CPF
@@ -44,11 +48,13 @@ public class Pessoa implements IDomain<Long> {
     @Column(name = "CPF")
     private String cpf;
     @Email
+    @Size(min = 0, max = 100)
     @Column(name = "EMAIL")
     private String email;
     @Column(name = "SEXO")
     private PessoaSexo pessoaSexo;
     @NotNull
+    @PastOrPresent
     @Column(name = "DATANASC")
     private LocalDate dataNascimento;
     @Column(name = "NATURALIDADE")

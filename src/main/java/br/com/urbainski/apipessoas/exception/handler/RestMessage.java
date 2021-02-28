@@ -1,6 +1,6 @@
 package br.com.urbainski.apipessoas.exception.handler;
 
-import java.util.List;
+import java.util.Map;
 
 import lombok.Getter;
 
@@ -8,9 +8,9 @@ import lombok.Getter;
 public class RestMessage {
 
     private String message;
-    private List<String> messages;
+    private Map<String, String> messages;
 
-    private RestMessage(List<String> messages) {
+    private RestMessage(Map<String, String> messages) {
 
         this.messages = messages;
     }
@@ -20,7 +20,7 @@ public class RestMessage {
         this.message = message;
     }
 
-    private RestMessage(String message, List<String> messages) {
+    private RestMessage(String message, Map<String, String> messages) {
 
         this.message = message;
         this.messages = messages;
@@ -29,6 +29,11 @@ public class RestMessage {
     public static RestMessage of(String message) {
 
         return new RestMessage(message);
+    }
+
+    public static RestMessage of(Map<String, String> messages) {
+
+        return new RestMessage(messages);
     }
 
 }

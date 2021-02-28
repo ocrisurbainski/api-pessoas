@@ -1,6 +1,11 @@
 package br.com.urbainski.apipessoas.exception.handler;
 
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Set;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -9,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import br.com.urbainski.apipessoas.exception.PessoaNotFoundException;
 
@@ -20,7 +26,7 @@ import lombok.RequiredArgsConstructor;
  */
 @ControllerAdvice
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-public class RestExceptionHandler {
+public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     private final MessageSource messageSource;
 
@@ -34,7 +40,34 @@ public class RestExceptionHandler {
 
         var message = messageSource.getMessage(messageKey, params, locale);
 
-        return new ResponseEntity(RestMessage.of(message), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<RestMessage>(RestMessage.of(message), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<RestMessage> handleMethodArgumentNotValid(ConstraintViolationException ex, Locale locale) {
+
+        var restMessage = createRestMessageOfFieldErrors(ex.getConstraintViolations(), locale);
+
+        return new ResponseEntity<RestMessage>(restMessage, HttpStatus.NOT_FOUND);
+    }
+
+    private RestMessage createRestMessageOfFieldErrors(Set<ConstraintViolation<?>> errors, Locale locale) {
+
+        if (errors == null || errors.size() == 0) {
+
+            return null;
+        }
+
+        var mapErrors = new HashMap<String, String>();
+
+        errors.stream().forEach(constraintViolation -> {
+
+            var property = constraintViolation.getPropertyPath().toString();
+
+            mapErrors.put(property, constraintViolation.getMessage());
+        });
+
+        return RestMessage.of(mapErrors);
     }
 
 }
