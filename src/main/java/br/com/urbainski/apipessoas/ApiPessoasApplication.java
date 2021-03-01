@@ -8,10 +8,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-
 import br.com.urbainski.apipessoas.domain.PessoaSexo;
 
 @SpringBootApplication
@@ -20,18 +16,6 @@ public class ApiPessoasApplication {
     public static void main(String[] args) {
 
         SpringApplication.run(ApiPessoasApplication.class, args);
-    }
-
-    @Bean
-    public ObjectMapper getObjectMapper() {
-
-        var objectMapper = new ObjectMapper();
-
-        objectMapper.setSerializationInclusion(Include.NON_NULL);
-
-        objectMapper.registerModule(new JavaTimeModule());
-
-        return objectMapper;
     }
 
     @Bean
