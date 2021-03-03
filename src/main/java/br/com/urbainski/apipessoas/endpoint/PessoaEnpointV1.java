@@ -21,11 +21,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.urbainski.apipessoas.annotations.ApiPageable;
+import br.com.urbainski.apipessoas.config.SwaggerConfiguration;
 import br.com.urbainski.apipessoas.domain.Pessoa;
 import br.com.urbainski.apipessoas.dto.PessoaDTO;
 import br.com.urbainski.apipessoas.exception.PessoaNotFoundException;
 import br.com.urbainski.apipessoas.service.IPessoaService;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Authorization;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/pessoa")
+@Api(tags = {SwaggerConfiguration.TAG_PESSOAS_V1})
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class PessoaEnpointV1 extends AbstractEndpoint {
 
@@ -40,6 +47,8 @@ public class PessoaEnpointV1 extends AbstractEndpoint {
     private final @NonNull ModelMapper modelMapper;
 
     @PostMapping
+    @ApiOperation(value = "Método utilizado para inserir uma nova pessoa.", authorizations = {
+            @Authorization("basicAuth")})
     public ResponseEntity insert(@RequestBody PessoaDTO pessoaDTO) {
 
         var pessoa = modelMapper.map(pessoaDTO, Pessoa.class);
@@ -56,6 +65,7 @@ public class PessoaEnpointV1 extends AbstractEndpoint {
     }
 
     @PutMapping("/{id}")
+    @ApiOperation(value = "Método utilizado para atualizar uma pessoa.", authorizations = {@Authorization("basicAuth")})
     public ResponseEntity update(
             @org.springframework.lang.NonNull @PathVariable("id") Long id,
             @org.springframework.lang.NonNull @RequestBody PessoaDTO pessoaDTO) {
@@ -76,6 +86,8 @@ public class PessoaEnpointV1 extends AbstractEndpoint {
     }
 
     @DeleteMapping("/{id}")
+    @ApiOperation(value = "Método utilizado para remover uma pessoa.", authorizations = {@Authorization("basicAuth")})
+    @ApiImplicitParam(name = "id", dataType = "long", defaultValue = "1", required = true, paramType = "path")
     public ResponseEntity delete(@PathVariable("id") Long id) {
 
         if (pessoaService.existsById(id)) {
@@ -89,6 +101,9 @@ public class PessoaEnpointV1 extends AbstractEndpoint {
     }
 
     @GetMapping("/{id}")
+    @ApiOperation(value = "Método utilizado para recuperar os dados de uma pessoa pelo seu identificador.", authorizations = {
+            @Authorization("basicAuth")})
+    @ApiImplicitParam(name = "id", dataType = "long", defaultValue = "1", required = true, paramType = "path")
     public ResponseEntity<EntityModel<PessoaDTO>> findById(
             @org.springframework.lang.NonNull @PathVariable("id") Long id) {
 
@@ -102,6 +117,9 @@ public class PessoaEnpointV1 extends AbstractEndpoint {
     }
 
     @GetMapping
+    @ApiOperation(value = "Método utilizado para pesquisar as pessoas cadastradas.", authorizations = {
+            @Authorization("basicAuth")})
+    @ApiPageable
     public ResponseEntity<CollectionModel<EntityModel<PessoaDTO>>> findAll(Pageable pageable) {
 
         var page = pessoaService.findAll(pageable);
