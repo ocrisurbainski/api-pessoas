@@ -14,8 +14,8 @@
 	<groupId>br.com.urbainski</groupId>
 	<artifactId>api-pessoas</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>api-produtos</name>
-	<description>API de produtos</description>
+	<name>api-pessoas</name>
+	<description>API de pessoas</description>
 
 	<properties>
 		<java.version>15</java.version>
