@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import br.com.urbainski.apipessoas.exception.PessoaDuplicateException;
 import br.com.urbainski.apipessoas.exception.PessoaNotFoundException;
 
 import lombok.RequiredArgsConstructor;
@@ -32,15 +33,28 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(PessoaNotFoundException.class)
     public HttpEntity<RestMessage> handlePessoaNotFoundException(
-            PessoaNotFoundException clienteNotFoundException, Locale locale) {
+            PessoaNotFoundException pessoaNotFoundException, Locale locale) {
 
-        var messageKey = "cliente.not.found.message";
+        var messageKey = "pessoa.not.found.message";
 
-        var params = new Object[]{clienteNotFoundException.getId()};
+        var params = new Object[]{pessoaNotFoundException.getId()};
 
         var message = messageSource.getMessage(messageKey, params, locale);
 
         return new ResponseEntity<RestMessage>(RestMessage.of(message), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(PessoaDuplicateException.class)
+    public HttpEntity<RestMessage> handlePessoaDuplicateException(
+            PessoaDuplicateException pessoaDuplicateException, Locale locale) {
+
+        var messageKey = "pessoa.duplicate.message";
+
+        var params = new Object[]{pessoaDuplicateException.getCpf()};
+
+        var message = messageSource.getMessage(messageKey, params, locale);
+
+        return new ResponseEntity<RestMessage>(RestMessage.of(message), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
