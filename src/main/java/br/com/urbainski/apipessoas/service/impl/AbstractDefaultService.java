@@ -19,14 +19,28 @@ public abstract class AbstractDefaultService<ENTITY extends IDomain, PK> impleme
     @Autowired
     protected JpaRepository<ENTITY, PK> repository;
 
+    protected void preInsert(ENTITY entity) {
+
+
+    }
+
     @Override
     public ENTITY insert(ENTITY entity) {
+
+        preInsert(entity);
 
         return repository.save(entity);
     }
 
+    protected void preUpdate(ENTITY entity) {
+
+
+    }
+
     @Override
     public ENTITY update(ENTITY entity) {
+
+        preUpdate(entity);
 
         return repository.save(entity);
     }
