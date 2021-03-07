@@ -1,5 +1,8 @@
 package br.com.urbainski.apipessoas.endpoint;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,9 +24,12 @@ public class SourceEndpoint extends AbstractEndpoint {
 
     @GetMapping
     @ApiOperation(value = "Devolve a url do repositório do projeto no GitHub.")
-    public ResponseEntity<String> source() {
+    public ResponseEntity<Map<String, String>> getSource() {
 
-        return ok("https://github.com/CristianUrbainski/api-pessoas");
+        var map = new HashMap<String, String>();
+        map.put("backend", "https://github.com/CristianUrbainski/api-pessoas");
+
+        return ok(map);
     }
 
 }
