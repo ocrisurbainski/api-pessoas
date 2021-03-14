@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,18 +20,22 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.urbainski.apipessoas.annotations.ApiPageable;
 import br.com.urbainski.apipessoas.config.SwaggerConfiguration;
 import br.com.urbainski.apipessoas.domain.Pessoa;
-import br.com.urbainski.apipessoas.dto.PessoaDTO;
+import br.com.urbainski.apipessoas.dto.PessoaCadastroDTO;
+import br.com.urbainski.apipessoas.dto.PessoaResponseDTO;
 import br.com.urbainski.apipessoas.exception.PessoaNotFoundException;
 import br.com.urbainski.apipessoas.service.IPessoaService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -49,15 +54,21 @@ public class PessoaEnpointV1 extends AbstractEndpoint {
     @PostMapping
     @ApiOperation(value = "Método utilizado para inserir uma nova pessoa.", authorizations = {
             @Authorization("basicAuth")})
-    public ResponseEntity insert(@RequestBody PessoaDTO pessoaDTO) {
+    @ResponseStatus(HttpStatus.CREATED)
+    @ApiResponses({
+            @ApiResponse(code = 201, message = "Pessoa cadastrada com sucesso"),
+            @ApiResponse(code = 401, message = "Caso não tenha sido feita a autenticação"),
+            @ApiResponse(code = 500, message = "Caso a pessoa com o CPF informado já exista, ou algum outro problema com os dados")
+    })
+    public ResponseEntity<EntityModel<PessoaResponseDTO>> insert(@RequestBody PessoaCadastroDTO pessoaCadastroDTO) {
 
-        var pessoa = modelMapper.map(pessoaDTO, Pessoa.class);
+        var pessoa = modelMapper.map(pessoaCadastroDTO, Pessoa.class);
 
         pessoa = pessoaService.insert(pessoa);
 
-        var pessoaDtoResult = modelMapper.map(pessoa, PessoaDTO.class);
+        var pessoaResponseDTO = modelMapper.map(pessoa, PessoaResponseDTO.class);
 
-        var entityModel = createEntityModel(pessoaDtoResult);
+        var entityModel = createEntityModel(pessoaResponseDTO);
 
         var uri = entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri();
 
@@ -66,21 +77,27 @@ public class PessoaEnpointV1 extends AbstractEndpoint {
 
     @PutMapping("/{id}")
     @ApiOperation(value = "Método utilizado para atualizar uma pessoa.", authorizations = {@Authorization("basicAuth")})
-    public ResponseEntity update(
+    @ResponseStatus(HttpStatus.OK)
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Pessoa atualizada com sucesso"),
+            @ApiResponse(code = 401, message = "Caso não tenha sido feita a autenticação"),
+            @ApiResponse(code = 500, message = "Caso a pessoa com o CPF informado já exista, ou algum outro problema com os dados")
+    })
+    public ResponseEntity<EntityModel<PessoaResponseDTO>> update(
             @org.springframework.lang.NonNull @PathVariable("id") Long id,
-            @org.springframework.lang.NonNull @RequestBody PessoaDTO pessoaDTO) {
+            @org.springframework.lang.NonNull @RequestBody PessoaCadastroDTO pessoaCadastroDTO) {
 
         var pessoa = pessoaService.findById(id).orElseThrow(() -> new PessoaNotFoundException(id));
 
-        pessoa = modelMapper.map(pessoaDTO, Pessoa.class);
+        pessoa = modelMapper.map(pessoaCadastroDTO, Pessoa.class);
 
         pessoa.setId(id);
 
         pessoa = pessoaService.update(pessoa);
 
-        var pessoaDtoResult = modelMapper.map(pessoa, PessoaDTO.class);
+        var pessoaResponseDTO = modelMapper.map(pessoa, PessoaResponseDTO.class);
 
-        var entityModel = createEntityModel(pessoaDtoResult);
+        var entityModel = createEntityModel(pessoaResponseDTO);
 
         return ok(entityModel);
     }
@@ -88,7 +105,13 @@ public class PessoaEnpointV1 extends AbstractEndpoint {
     @DeleteMapping("/{id}")
     @ApiOperation(value = "Método utilizado para remover uma pessoa.", authorizations = {@Authorization("basicAuth")})
     @ApiImplicitParam(name = "id", dataType = "long", defaultValue = "1", required = true, paramType = "path")
-    public ResponseEntity delete(@PathVariable("id") Long id) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ApiResponses({
+            @ApiResponse(code = 204, message = "Pessoa deletada com sucesso"),
+            @ApiResponse(code = 401, message = "Caso não tenha sido feita a autenticação"),
+            @ApiResponse(code = 404, message = "Caso a pessoa não seja encontrada")
+    })
+    public ResponseEntity<?> delete(@PathVariable("id") Long id) {
 
         if (pessoaService.existsById(id)) {
 
@@ -104,14 +127,20 @@ public class PessoaEnpointV1 extends AbstractEndpoint {
     @ApiOperation(value = "Método utilizado para recuperar os dados de uma pessoa pelo seu identificador.", authorizations = {
             @Authorization("basicAuth")})
     @ApiImplicitParam(name = "id", dataType = "long", defaultValue = "1", required = true, paramType = "path")
-    public ResponseEntity<EntityModel<PessoaDTO>> findById(
+    @ResponseStatus(HttpStatus.OK)
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Ok"),
+            @ApiResponse(code = 401, message = "Caso não tenha sido feita a autenticação"),
+            @ApiResponse(code = 404, message = "Caso a pessoa não seja encontrada")
+    })
+    public ResponseEntity<EntityModel<PessoaResponseDTO>> findById(
             @org.springframework.lang.NonNull @PathVariable("id") Long id) {
 
         var pessoa = pessoaService.findById(id).orElseThrow(() -> new PessoaNotFoundException(id));
 
-        var dto = modelMapper.map(pessoa, PessoaDTO.class);
+        var pessoaResponseDTO = modelMapper.map(pessoa, PessoaResponseDTO.class);
 
-        var entityModel = createEntityModel(dto);
+        var entityModel = createEntityModel(pessoaResponseDTO);
 
         return ok(entityModel);
     }
@@ -120,14 +149,19 @@ public class PessoaEnpointV1 extends AbstractEndpoint {
     @ApiOperation(value = "Método utilizado para pesquisar as pessoas cadastradas.", authorizations = {
             @Authorization("basicAuth")})
     @ApiPageable
-    public ResponseEntity<CollectionModel<EntityModel<PessoaDTO>>> findAll(Pageable pageable) {
+    @ResponseStatus(HttpStatus.OK)
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Ok"),
+            @ApiResponse(code = 401, message = "Caso não tenha sido feita a autenticação")
+    })
+    public ResponseEntity<CollectionModel<EntityModel<PessoaResponseDTO>>> findAll(Pageable pageable) {
 
         var page = pessoaService.findAll(pageable);
 
         var listDto = page.getContent().stream()
                 .map(pessoa -> {
-                    var dto = modelMapper.map(pessoa, PessoaDTO.class);
-                    var entityModel = createEntityModel(dto);
+                    var pessoaResponseDTO = modelMapper.map(pessoa, PessoaResponseDTO.class);
+                    var entityModel = createEntityModel(pessoaResponseDTO);
                     return entityModel;
                 })
                 .collect(Collectors.toList());
@@ -138,18 +172,18 @@ public class PessoaEnpointV1 extends AbstractEndpoint {
         return ok(collectionModel);
     }
 
-    private EntityModel<PessoaDTO> createEntityModel(PessoaDTO pessoaDTO) {
+    private EntityModel<PessoaResponseDTO> createEntityModel(PessoaResponseDTO pessoaResponseDTO) {
 
         var linkToFindById = linkTo(
-                methodOn(PessoaEnpointV1.class).findById(pessoaDTO.getId())).withSelfRel();
+                methodOn(PessoaEnpointV1.class).findById(pessoaResponseDTO.getId())).withSelfRel();
 
         var linkToFindAll = linkTo(
                 methodOn(PessoaEnpointV1.class).findAll(null)).withRel("pessoas");
 
         var linkToDelete = linkTo(
-                methodOn(PessoaEnpointV1.class).delete(pessoaDTO.getId())).withRel("delete");
+                methodOn(PessoaEnpointV1.class).delete(pessoaResponseDTO.getId())).withRel("delete");
 
-        return EntityModel.of(pessoaDTO, linkToFindById, linkToFindAll, linkToDelete);
+        return EntityModel.of(pessoaResponseDTO, linkToFindById, linkToFindAll, linkToDelete);
     }
 
 }

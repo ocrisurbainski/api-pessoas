@@ -1,7 +1,6 @@
 package br.com.urbainski.apipessoas.config;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -40,6 +39,7 @@ public class SwaggerConfiguration {
                 .apis(RequestHandlerSelectors.basePackage("br.com.urbainski.apipessoas.endpoint"))
                 .paths(PathSelectors.any())
                 .build()
+                .useDefaultResponseMessages(false)
                 .tags(new Tag(TAG_PESSOAS_V1, "Endpoint de pessoas V1"))
                 .tags(new Tag(TAG_SOURCE, "Endpoint do código do projeto"))
                 .ignoredParameterTypes(Pageable.class)

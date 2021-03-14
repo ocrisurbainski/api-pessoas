@@ -20,12 +20,6 @@ public class RestMessage {
         this.message = message;
     }
 
-    private RestMessage(String message, Map<String, String> messages) {
-
-        this.message = message;
-        this.messages = messages;
-    }
-
     public static RestMessage of(String message) {
 
         return new RestMessage(message);

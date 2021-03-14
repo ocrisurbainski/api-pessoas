@@ -4,7 +4,10 @@ import java.time.LocalDate;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -13,11 +16,12 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@ApiModel(value = "PessoaDTO", description = "DTO com os dados das pessoas")
-public class PessoaDTO {
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@ApiModel(value = "PessoaCadastroDTO", description = "DTO com os dados para cadastro das pessoas")
+public class PessoaCadastroDTO {
 
-    @ApiModelProperty(value = "Identificador da pessoa")
-    private Long id;
     @ApiModelProperty(value = "Nome da pessoa")
     private String nome;
     @ApiModelProperty(value = "CPF da pessoa")

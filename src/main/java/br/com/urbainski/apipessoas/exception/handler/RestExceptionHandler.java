@@ -62,7 +62,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
         var restMessage = createRestMessageOfFieldErrors(ex.getConstraintViolations(), locale);
 
-        return new ResponseEntity<RestMessage>(restMessage, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<RestMessage>(restMessage, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     private RestMessage createRestMessageOfFieldErrors(Set<ConstraintViolation<?>> errors, Locale locale) {

@@ -16,12 +16,7 @@ public abstract class AbstractEndpoint {
         return ResponseEntity.ok(value);
     }
 
-    protected ResponseEntity ok() {
-
-        return ResponseEntity.ok().build();
-    }
-
-    protected ResponseEntity notContent() {
+    protected ResponseEntity<?> notContent() {
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
@@ -29,11 +24,6 @@ public abstract class AbstractEndpoint {
     public <T> ResponseEntity<T> created(T value, URI uri) {
 
         return ResponseEntity.created(uri).body(value);
-    }
-
-    protected ResponseEntity notFound() {
-
-        return ResponseEntity.notFound().build();
     }
 
 }
