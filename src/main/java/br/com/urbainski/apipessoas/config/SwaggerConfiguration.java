@@ -56,7 +56,7 @@ public class SwaggerConfiguration {
         return new ApiInfo(
                 "api-pessoas",
                 "Api de pessoas",
-                "0.0.2-SNAPSHOT",
+                "0.0.3-SNAPSHOT",
                 "Terms of service",
                 getContact(),
                 "Apache License Version 2.0",
